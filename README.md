@@ -24,3 +24,4 @@ Use sudo docker compose build para construir la imagen y sudo docker compose up 
 curl http://127.0.0.1:5000/download --output histograma.png
 curl http://127.0.0.1:5000/aerolineas --output aerolineas.png
 
+
