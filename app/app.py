@@ -37,5 +37,38 @@ def download_dataset():
     img_bytes.seek(0)
     return send_file(img_bytes, mimetype='image/png', as_attachment=False, download_name="histograma.png")
 
+
+@app.route("/aerolineas", methods=["GET"] )
+def download_companies_dataset():
+    api.authenticate()
+    api.dataset_download_files('shubhambathwal/flight-price-prediction', path='.', unzip=True)
+    dataset_path = './'
+    file_name = 'economy.csv'
+    file_path = os.path.join(dataset_path, file_name)
+    if not os.path.exists(file_path):
+        return "El archivo CSV no fue encontrado tras la descarga.", 404
+    
+    df = pd.read_csv(file_path)
+    if "price" not in df.columns:
+        return "La columna 'price' no existe en el archivo CSV.", 404
+
+    com_counts=df['airline'].value_counts()
+    com_counts_table=pd.DataFrame(com_counts)
+    
+    plt.figure(figsize=(10,6))
+    fig,ax=plt.subplots()
+    ax.pie(com_counts_table.values.squeeze(),labels=com_counts_table.index
+       ,autopct='%1.1f%%',shadow=True)
+    plt.title('airline Distribution')
+    
+    img_bytes = io.BytesIO()
+    plt.savefig(img_bytes, format='png')
+    plt.close()
+    img_bytes.seek(0)
+    return send_file(img_bytes, mimetype='image/png', as_attachment=False, download_name="aerolineas.png")
+
+    
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
